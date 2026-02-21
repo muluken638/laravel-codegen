@@ -2,10 +2,63 @@
 {% block content %}
 
 <div class="row">
-    <div class="col-md-6">
-        <h3>Add Field</h3>
-        <form method="post" action="/add_field">
-            <input type="hidden" name="table_id" value="{{table_id}}">
+    <div class="col-12 mb-4">
+        <h3>Fields for Table: <strong>{{ table_name | replace("_"," ") | title }}</strong></h3>
+        <!-- Fields Table -->
+        {% if fields %}
+        <table class="table table-hover bg-light">
+            <thead class="table-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Nullable</th>
+                    <th>Enum</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for f in fields %}
+                <tr>
+                    <td>{{ f[1] | replace("_"," ") | title }}</td>
+                    <td>{{ f[2] }}</td>
+                    <td>{{ 'Yes' if f[3] else 'No' }}</td>
+                    <td>
+                        {% if f[2] == 'enum' %}
+                            {% for e in enums %}
+                                {% if e[0] == f[4] %}{{ e[1] }}{% endif %}
+                            {% endfor %}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        <!-- Can add edit/delete buttons here -->
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <small>No fields added yet.</small>
+        {% endif %}
+
+        <button class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#addFieldModal">
+            <i class="bi bi-plus-circle"></i> Add Field
+        </button>
+    </div>
+</div>
+
+<!-- Add Field Modal -->
+<div class="modal fade" id="addFieldModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" action="/add_field">
+        <input type="hidden" name="table_id" value="{{table_id}}">
+        <div class="modal-header">
+          <h5 class="modal-title">Add Field</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
             <div class="mb-3">
                 <label>Field Name</label>
                 <input name="name" class="form-control" required>
@@ -16,6 +69,7 @@
                 <select name="type" id="type" class="form-select" onchange="toggleEnum()">
                     <option value="string">string</option>
                     <option value="integer">integer</option>
+                    <option value="bigInteger">bigInteger</option>
                     <option value="text">text</option>
                     <option value="boolean">boolean</option>
                     <option value="date">date</option>
@@ -37,19 +91,23 @@
                 <label>Select Enum</label>
                 <select name="enum_id" class="form-select">
                     {% for e in enums %}
-                    <option value="{{e[0]}}">{{e[1]}}</option>
+                    <option value="{{ e[0] }}">{{ e[1] | replace("_"," ") | title }}</option>
                     {% endfor %}
                 </select>
             </div>
-
+        </div>
+        <div class="modal-footer">
             <button type="submit" class="btn btn-success">Add Field</button>
-        </form>
+        </div>
+      </form>
     </div>
+  </div>
+</div>
 
-    <div class="col-md-6">
+<!-- CodeGen Tabs -->
+<div class="row mt-4">
+    <div class="col-12">
         <h3>CodeGen</h3>
-
-        <!-- Top-level tabs: Front-End / Back-End -->
         <ul class="nav nav-tabs mb-3" id="codeGenTabs">
             <li class="nav-item">
                 <a class="nav-link active" id="frontend-tab" href="#" onclick="showTopTab('frontend')">Front-End</a>
@@ -110,6 +168,12 @@
 </div>
 
 <script>
+function toggleEnum() {
+    let type = document.getElementById("type").value;
+    document.getElementById("enum_select").style.display =
+        type === "enum" ? "block" : "none";
+}
+
 function showTopTab(tab) {
     document.getElementById('frontend').style.display = (tab==='frontend') ? 'block':'none';
     document.getElementById('backend').style.display = (tab==='backend') ? 'block':'none';
@@ -121,6 +185,13 @@ function showBackTab(tab) {
     let backTabs = ['migration','model','controller','route','guide'];
     backTabs.forEach(t => document.getElementById(t).style.display='none');
     document.getElementById(tab).style.display='block';
+}
+
+function copyCode(id) {
+    let code = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(code).then(() => {
+        alert("Copied!");
+    });
 }
 </script>
 

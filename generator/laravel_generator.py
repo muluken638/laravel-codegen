@@ -63,11 +63,13 @@ class LaravelGenerator:
 
                 values = get_enum_values(enum_id)
 
-                enum_values = ",".join(
-                    [f"'{v}'" for v in values]
-                )
-
-                field_line = f"$table->enum('{name}', [{enum_values}])"
+                if values:
+                    enum_values = ",".join(
+                        [f"'{v['name']}'" for v in values]
+                    )
+                    field_line = f"$table->enum('{name}', [{enum_values}])"
+                else:
+                    field_line = f"$table->string('{name}')"
 
             else:
                 field_line = f"$table->string('{name}')"

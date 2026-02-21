@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h3>PHP Enum Code: {{ enum_name | replace("_", " ") | title }}</h3>
+
+<div class="card p-3">
+    <pre>{{ php_code }}</pre>
+</div>
+
+<a href="/enums/{{ enum_id }}" class="btn btn-secondary mt-2">Back to Enums</a>
+
+{% endblock %}

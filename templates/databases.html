@@ -1,27 +1,13 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<div class="row mb-4">
-    <div class="col-md-6">
-        <h3>Databases</h3>
-        {% for db in databases %}
-        <div class="card p-3">
-            <strong>{{ db[1] }}</strong>
-            <a href="/tables/{{ db[0] }}" class="btn btn-sm btn-primary float-end">Open</a>
-        </div>
-        {% endfor %}
+<h3>Create Database</h3>
+<form method="post" action="/create_database">
+    <div class="mb-3">
+        <label>Name</label>
+        <input class="form-control" name="name" placeholder="e.g. sales_database" required>
     </div>
-
-    <div class="col-md-6">
-        <h3>Create Database</h3>
-        <form method="post" action="/create_database">
-            <div class="mb-3">
-                <label>Name</label>
-                <input class="form-control" name="name" placeholder="e.g. sales_database" required>
-            </div>
-            <button class="btn btn-success">Create</button>
-        </form>
-    </div>
-</div>
+    <button class="btn btn-success">Create</button>
+</form>
 
 {% endblock %}

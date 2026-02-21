@@ -42,14 +42,10 @@ def add_enum_value(enum_id, value):
 
 
 def get_enum_values(enum_id):
-
     conn = get_connection()
-
     rows = conn.execute(
-        "SELECT value FROM enum_values WHERE enum_id=?",
-        (enum_id,)
+        "SELECT id, value FROM enum_values WHERE enum_id=?", (enum_id,)
     ).fetchall()
-
     conn.close()
-
-    return [r[0] for r in rows]
+    # Assign numeric codes starting from 100
+    return [{"name": r[1], "value": 100 + r[0]} for r in rows]

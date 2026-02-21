@@ -1,38 +1,162 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<div class="row">
-    <div class="col-md-6">
-        <h3>Tables</h3>
-        {% for t in tables %}
-        <div class="card p-3">
-            <strong>{{ t[1].title()|replace(" ","") }}</strong>
-            <a href="/codegen/{{ t[0] }}" class="btn btn-sm btn-primary float-end">CodeGen</a>
+<div class="container ">
+    <!-- Horizontal Tabs -->
+    <ul class="nav nav-tabs " id="mainTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="tables-tab" data-bs-toggle="tab" data-bs-target="#tables-tab-pane" type="button" role="tab">
+                Tables <i class="bi bi-plus-circle ms-1" style="cursor:pointer;" data-bs-toggle="modal" data-bs-target="#addTableModal"></i>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="enums-tab" data-bs-toggle="tab" data-bs-target="#enums-tab-pane" type="button" role="tab">
+                Enums <i class="bi bi-plus-circle ms-1" style="cursor:pointer;" data-bs-toggle="modal" data-bs-target="#addEnumModal"></i>
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="mainTabsContent">
+        <!-- Tables Tab -->
+        <div class="tab-pane fade show active" id="tables-tab-pane" role="tabpanel">
+            {% if tables %}
+            <table class="table table-hover table-sm bg-light">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Name</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in tables %}
+                    <tr>
+                        <td>{{ t[1] | replace("_"," ") | title }}</td>
+                        <td>
+                            <a href="/codegen/{{ t[0] }}" class="btn btn-sm btn-primary">CodeGen</a>
+                            <a href="/edit_table/{{ t[0] }}" class="btn btn-sm btn-warning">Edit</a>
+                            <a href="/delete_table/{{ t[0] }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <small>No tables found</small>
+            {% endif %}
         </div>
-        {% endfor %}
-    </div>
 
-    <div class="col-md-6">
-        <h3>Create Table</h3>
-        <form method="post" action="/create_table">
-            <input type="hidden" name="database_id" value="{{ database_id }}">
-            <div class="mb-3">
-                <label>Name</label>
-                <input class="form-control" name="name" placeholder="e.g. sales_manager" required>
-            </div>
-            <button class="btn btn-success">Create</button>
-        </form>
+        <!-- Enums Tab -->
+        <!-- Enums Tab -->
+<div class="tab-pane fade" id="enums-tab-pane" role="tabpanel">
+    {% if enums %}
+    <table class="table table-hover bg-light">
+        <thead class="table-dark">
+            <tr>
+                <th>Enum Name</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for e in enums %}
+            <tr>
+                <td>
+                    <button class="btn btn-link p-0" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#enumValues-{{ e[0] }}">
+                        {{ e[1] | replace("_"," ") | title }}
+                    </button>
+                </td>
+                <td>
+                    <a href="/enums/{{ e[0] }}/codegen" class="btn btn-sm btn-primary">CodeGen</a>
+                    <a href="/edit_enum/{{ e[0] }}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="/delete_enum/{{ e[0] }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                </td>
+            </tr>
+            <tr class="collapse" id="enumValues-{{ e[0] }}">
+                <td colspan="2">
+                    {% set values = get_enum_values(e[0]) %}
+                    {% if values %}
+                    <table class="table table-sm table-bordered mb-1">
+                        <thead>
+                            <tr>
+                                <th>Value Name</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for v in values %}
+                            <tr>
+                                <td>{{ v.name }}</td>
+                                <td>{{ v.value }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                        <small>No values yet</small>
+                    {% endif %}
 
-        <h3 class="mt-4">Create Enum</h3>
-        <form method="post" action="/create_enum">
-            <input type="hidden" name="database_id" value="{{ database_id }}">
-            <div class="mb-3">
-                <label>Name</label>
-                <input class="form-control" name="name" placeholder="e.g. status" required>
-            </div>
-            <button class="btn btn-warning">Create Enum</button>
-        </form>
+                    <form method="post" action="/enums/{{ e[0] }}/add_value" class="d-flex mt-2">
+                        <input type="hidden" name="database_id" value="{{ database_id }}">
+                        <input type="text" name="value" class="form-control me-2" placeholder="New Value" required>
+                        <button class="btn btn-sm btn-success">Add Value</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <small>No enums yet</small>
+    {% endif %}
+</div>
     </div>
+</div>
+
+<!-- Modals for Add Table / Enum -->
+<div class="modal fade" id="addTableModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" action="/create_table">
+        <input type="hidden" name="database_id" value="{{ database_id }}">
+        <div class="modal-header">
+          <h5 class="modal-title">Add Table</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label>Name</label>
+            <input class="form-control" name="name" placeholder="e.g. sales_manager" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-success">Create Table</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="addEnumModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" action="/create_enum">
+        <input type="hidden" name="database_id" value="{{ database_id }}">
+        <div class="modal-header">
+          <h5 class="modal-title">Add Enum</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label>Name</label>
+            <input class="form-control" name="name" placeholder="e.g. status" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-warning">Create Enum</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 
 {% endblock %}

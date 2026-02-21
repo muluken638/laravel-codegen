@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h3>Enum: {{ enum_name | replace("_", " ") | title }}</h3>
+
+<div class="card p-3 mb-3">
+    {% if values %}
+    <table class="table table-bordered table-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>Value Name</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for v in values %}
+            <tr>
+                <td>{{ v.name }}</td>
+                <td>{{ v.value }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="/enums/{{ enum_id }}/codegen" class="btn btn-primary mt-2">Generate PHP Enum</a>
+
+    {% else %}
+        <small>No values yet.</small>
+    {% endif %}
+</div>
+
+<a href="/tables/{{database_id}}" class="btn btn-secondary mt-2">Back to Tables</a>
+
+{% endblock %}

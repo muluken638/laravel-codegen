@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h3>Enum: {{ enum_name }}</h3>
+
+<div class="card p-3 mb-3">
+    <h5>Values</h5>
+
+    {% if values %}
+    <table class="table table-sm table-bordered">
+        <thead>
+            <tr>
+                <th>Value</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for v in values %}
+            <tr>
+                <td>{{ v }}</td>
+                <td>
+                    <a href="/enums/{{ enum_id }}/delete_value/{{ v }}" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <small>No values yet.</small>
+    {% endif %}
+
+    <form method="post" action="/enums/{{ enum_id }}/add_value">
+        <div class="mb-3">
+            <input type="text" class="form-control" name="value" placeholder="New value e.g. Active" required>
+        </div>
+        <button class="btn btn-success">Add Value</button>
+    </form>
+</div>
+
+<a href="/tables/{{ database_id }}" class="btn btn-secondary mt-2">Back to Tables</a>
+
+{% endblock %}
