@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="row">
+    <div class="col-md-6">
+        <h3>Tables</h3>
+        {% for t in tables %}
+        <div class="card p-3">
+            <strong>{{ t[1].title()|replace(" ","") }}</strong>
+            <a href="/codegen/{{ t[0] }}" class="btn btn-sm btn-primary float-end">CodeGen</a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="col-md-6">
+        <h3>Create Table</h3>
+        <form method="post" action="/create_table">
+            <input type="hidden" name="database_id" value="{{ database_id }}">
+            <div class="mb-3">
+                <label>Name</label>
+                <input class="form-control" name="name" placeholder="e.g. sales_manager" required>
+            </div>
+            <button class="btn btn-success">Create</button>
+        </form>
+
+        <h3 class="mt-4">Create Enum</h3>
+        <form method="post" action="/create_enum">
+            <input type="hidden" name="database_id" value="{{ database_id }}">
+            <div class="mb-3">
+                <label>Name</label>
+                <input class="form-control" name="name" placeholder="e.g. status" required>
+            </div>
+            <button class="btn btn-warning">Create Enum</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

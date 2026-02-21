@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Laravel Code Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body { padding: 20px; background: #f8f9fa; }
+        pre { background: #212529; color: #f8f9fa; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        .tab-btn { margin-right: 10px; margin-bottom: 10px; }
+        .copy-btn { cursor: pointer; margin-left: 5px; }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">Laravel CodeGen</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
+        data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="/">Databases</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" onclick="showTab('guide'); return false;">Guide</a></li>
+        </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+    {% block content %}{% endblock %}
+</div>
+
+<script>
+function toggleEnum() {
+    let type = document.getElementById("type").value;
+    document.getElementById("enum_select").style.display =
+        type === "enum" ? "block" : "none";
+}
+
+function showTab(id) {
+    let tabs = ['migration', 'model', 'controller', 'route', 'guide'];
+    tabs.forEach(t => {
+        let el = document.getElementById(t);
+        if(el) el.style.display='none';
+    });
+    let target = document.getElementById(id);
+    if(target) target.style.display='block';
+}
+
+function copyCode(id) {
+    let code = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(code).then(() => {
+        alert("Copied!");
+    });
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

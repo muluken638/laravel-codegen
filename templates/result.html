@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Generated Code</title>
+    <style>
+      pre {
+        background: #ca0505;
+        color: #22f191;
+        padding: 15px;
+        overflow-x: auto;
+      }
+      button {
+        margin: 5px;
+        background-color: #00ff88;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Generated Laravel Code</h2>
+
+    <h3>Model</h3>
+    <button onclick="copyCode('model')">Copy</button>
+    <pre id="model">{{ model }}</pre>
+
+    <h3>Controller</h3>
+    <button onclick="copyCode('controller')">Copy</button>
+    <pre id="controller">{{ controller }}</pre>
+
+    <h3>Migration</h3>
+    <button onclick="copyCode('migration')">Copy</button>
+    <pre id="migration">{{ migration }}</pre>
+
+    <script>
+      function copyCode(id) {
+        const text = document.getElementById(id).innerText;
+        navigator.clipboard.writeText(text);
+        alert("Copied!");
+      }
+    </script>
+  </body>
+</html>
