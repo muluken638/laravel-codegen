@@ -1,6 +1,7 @@
-from curses import flash
 
-from flask import Flask, render_template, request, redirect,url_for
+
+from flask import Flask, render_template, request, redirect, url_for, flash
+
 from database.database import init_db, get_connection
 from database.database_service import *
 from database.table_service import *
@@ -161,7 +162,7 @@ def enum_values(enum_id):
     values = get_enum_values(enum_id)
     return render_template("enum_values.html", enum_id=enum_id, enum_name=row[0], values=values, database_id=row[1])
 # Add a new value to an enum
-@app.route("/enums/<int:enum_id>/add_value", methods=["POST"])
+@app.route("/enums/<int:enum_id>/add-value", methods=["POST"])
 def add_enum_value_route(enum_id):
     value = request.form["value"]
     add_enum_value(enum_id, value)

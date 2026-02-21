@@ -4,12 +4,21 @@
 <h3>Enum: {{ enum_name | replace("_", " ") | title }}</h3>
 
 <div class="card p-3 mb-3">
+
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="mb-0">Enum Values</h5>
+        <a href="/enums/{{ enum_id }}/add_value" class="btn btn-success btn-sm">
+            ➕ Add Enum Value
+        </a>
+    </div>
+
     {% if values %}
-    <table class="table table-bordered table-sm">
+    <table class="table table-bordered table-sm align-middle">
         <thead class="table-dark">
             <tr>
                 <th>Value Name</th>
                 <th>Value</th>
+                <th width="150">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -17,17 +26,38 @@
             <tr>
                 <td>{{ v.name }}</td>
                 <td>{{ v.value }}</td>
+                <td>
+                    <a href="/enums/value/{{ v.id }}/edit"
+                       class="btn btn-warning btn-sm">
+                        ✏
+                    </a>
+
+                    <a href="/enums/value/{{ v.id }}/delete"
+                       class="btn btn-danger btn-sm"
+                       onclick="return confirm('Are you sure you want to delete this value?');">
+                        🗑
+                    </a>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-    <a href="/enums/{{ enum_id }}/codegen" class="btn btn-primary mt-2">Generate PHP Enum</a>
+
+    <a href="/enums/{{ enum_id }}/codegen"
+       class="btn btn-primary mt-2">
+        ⚡ Generate PHP Enum
+    </a>
 
     {% else %}
-        <small>No values yet.</small>
+        <div class="alert alert-info">
+            No enum values yet.
+        </div>
     {% endif %}
+
 </div>
 
-<a href="/tables/{{database_id}}" class="btn btn-secondary mt-2">Back to Tables</a>
+<a href="/tables/{{database_id}}" class="btn btn-secondary mt-2">
+    ⬅ Back to Tables
+</a>
 
 {% endblock %}
