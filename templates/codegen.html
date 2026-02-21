@@ -1,51 +1,52 @@
-{% extends "layout.html" %}
-{% block content %}
+{% extends "layout.html" %} {% block content %}
 
 <div class="row">
-    <div class="col-12 mb-4">
-        <h3>Fields for Table: <strong>{{ table_name | replace("_"," ") | title }}</strong></h3>
-        <!-- Fields Table -->
-        {% if fields %}
-        <table class="table table-hover bg-light">
-            <thead class="table-dark">
-                <tr>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>Nullable</th>
-                    <th>Enum</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for f in fields %}
-                <tr>
-                    <td>{{ f[1] | replace("_"," ") | title }}</td>
-                    <td>{{ f[2] }}</td>
-                    <td>{{ 'Yes' if f[3] else 'No' }}</td>
-                    <td>
-                        {% if f[2] == 'enum' %}
-                            {% for e in enums %}
-                                {% if e[0] == f[4] %}{{ e[1] }}{% endif %}
-                            {% endfor %}
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
-                    <td>
-                        <!-- Can add edit/delete buttons here -->
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-            <small>No fields added yet.</small>
-        {% endif %}
+  <div class="col-12 mb-4">
+    <h3>
+      Fields for Table:
+      <strong>{{ table_name | replace("_"," ") | title }}</strong>
+    </h3>
+    <!-- Fields Table -->
+    {% if fields %}
+    <table class="table table-hover bg-light">
+      <thead class="table-dark">
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Nullable</th>
+          <th>Enum</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in fields %}
+        <tr>
+          <td>{{ f[1] | replace("_"," ") | title }}</td>
+          <td>{{ f[2] }}</td>
+          <td>{{ 'Yes' if f[3] else 'No' }}</td>
+          <td>
+            {% if f[2] == 'enum' %} {% for e in enums %} {% if e[0] == f[4] %}{{
+            e[1] }}{% endif %} {% endfor %} {% else %} - {% endif %}
+          </td>
+          <td>
+            <!-- Can add edit/delete buttons here -->
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <small>No fields added yet.</small>
+    {% endif %}
 
-        <button class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#addFieldModal">
-            <i class="bi bi-plus-circle"></i> Add Field
-        </button>
-    </div>
+    <button
+      class="btn btn-success mt-2"
+      data-bs-toggle="modal"
+      data-bs-target="#addFieldModal"
+    >
+      <i class="bi bi-plus-circle"></i> Add Field
+    </button>
+  </div>
 </div>
 
 <!-- Add Field Modal -->
@@ -53,51 +54,67 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <form method="post" action="/add_field">
-        <input type="hidden" name="table_id" value="{{table_id}}">
+        <input type="hidden" name="table_id" value="{{table_id}}" />
         <div class="modal-header">
           <h5 class="modal-title">Add Field</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+          ></button>
         </div>
         <div class="modal-body">
-            <div class="mb-3">
-                <label>Field Name</label>
-                <input name="name" class="form-control" required>
-            </div>
+          <div class="mb-3">
+            <label>Field Name</label>
+            <input name="name" class="form-control" required />
+          </div>
 
-            <div class="mb-3">
-                <label>Type</label>
-                <select name="type" id="type" class="form-select" onchange="toggleEnum()">
-                    <option value="string">string</option>
-                    <option value="integer">integer</option>
-                    <option value="bigInteger">bigInteger</option>
-                    <option value="text">text</option>
-                    <option value="boolean">boolean</option>
-                    <option value="date">date</option>
-                    <option value="datetime">datetime</option>
-                    <option value="timestamp">timestamp</option>
-                    <option value="float">float</option>
-                    <option value="double">double</option>
-                    <option value="json">json</option>
-                    <option value="enum">enum</option>
-                </select>
-            </div>
+          <div class="mb-3">
+            <label>Type</label>
+            <select
+              name="type"
+              id="type"
+              class="form-select"
+              onchange="toggleEnum()"
+            >
+              <option value="string">string</option>
+              <option value="integer">integer</option>
+              <option value="bigInteger">bigInteger</option>
+              <option value="text">text</option>
+              <option value="boolean">boolean</option>
+              <option value="date">date</option>
+              <option value="datetime">datetime</option>
+              <option value="timestamp">timestamp</option>
+              <option value="float">float</option>
+              <option value="double">double</option>
+              <option value="json">json</option>
+              <option value="enum">enum</option>
+            </select>
+          </div>
 
-            <div class="form-check mb-3">
-                <input type="checkbox" name="nullable" value="1" class="form-check-input">
-                <label class="form-check-label">Nullable</label>
-            </div>
+          <div class="form-check mb-3">
+            <input
+              type="checkbox"
+              name="nullable"
+              value="1"
+              class="form-check-input"
+            />
+            <label class="form-check-label">Nullable</label>
+          </div>
 
-            <div id="enum_select" class="mb-3" style="display:none">
-                <label>Select Enum</label>
-                <select name="enum_id" class="form-select">
-                    {% for e in enums %}
-                    <option value="{{ e[0] }}">{{ e[1] | replace("_"," ") | title }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+          <div id="enum_select" class="mb-3" style="display: none">
+            <label>Select Enum</label>
+            <select name="enum_id" class="form-select">
+              {% for e in enums %}
+              <option value="{{ e[0] }}">
+                {{ e[1] | replace("_"," ") | title }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
         </div>
         <div class="modal-footer">
-            <button type="submit" class="btn btn-success">Add Field</button>
+          <button type="submit" class="btn btn-success">Add Field</button>
         </div>
       </form>
     </div>
@@ -106,93 +123,152 @@
 
 <!-- CodeGen Tabs -->
 <div class="row mt-4">
-    <div class="col-12">
-        <h3>CodeGen</h3>
-        <ul class="nav nav-tabs mb-3" id="codeGenTabs">
-            <li class="nav-item">
-                <a class="nav-link active" id="frontend-tab" href="#" onclick="showTopTab('frontend')">Front-End</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="backend-tab" href="#" onclick="showTopTab('backend')">Back-End</a>
-            </li>
-        </ul>
+  <div class="col-12">
+    <h3>CodeGen</h3>
+    <ul class="nav nav-tabs mb-3" id="codeGenTabs">
+      <li class="nav-item">
+        <a
+          class="nav-link active"
+          id="frontend-tab"
+          href="#"
+          onclick="showTopTab('frontend')"
+          >Front-End</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          id="backend-tab"
+          href="#"
+          onclick="showTopTab('backend')"
+          >Back-End</a
+        >
+      </li>
+    </ul>
 
-        <!-- Front-End Tab (empty for now) -->
-        <div id="frontend" class="tab-content p-2 border rounded" style="display:block;">
-            <p class="text-muted">Front-End code generation coming soon...</p>
-        </div>
-
-        <!-- Back-End Tab -->
-        <div id="backend" class="tab-content p-2 border rounded" style="display:none;">
-            <div class="mb-3">
-                <button class="btn btn-primary tab-btn" onclick="showBackTab('migration')">Migration</button>
-                <button class="btn btn-secondary tab-btn" onclick="showBackTab('model')">Model</button>
-                <button class="btn btn-info tab-btn" onclick="showBackTab('controller')">Controller</button>
-                <button class="btn btn-warning tab-btn" onclick="showBackTab('route')">Route</button>
-                <button class="btn btn-dark tab-btn" onclick="showBackTab('guide')">Guide</button>
-            </div>
-
-            <div id="migration" class="back-tab">
-                <pre id="migration_code">{{migration}}</pre>
-                <button class="btn btn-sm btn-light copy-btn" onclick="copyCode('migration_code')">
-                    <i class="bi bi-clipboard"></i> Copy
-                </button>
-            </div>
-
-            <div id="model" class="back-tab" style="display:none;">
-                <pre id="model_code">{{model}}</pre>
-                <button class="btn btn-sm btn-light copy-btn" onclick="copyCode('model_code')">
-                    <i class="bi bi-clipboard"></i> Copy
-                </button>
-            </div>
-
-            <div id="controller" class="back-tab" style="display:none;">
-                <pre id="controller_code">{{controller}}</pre>
-                <button class="btn btn-sm btn-light copy-btn" onclick="copyCode('controller_code')">
-                    <i class="bi bi-clipboard"></i> Copy
-                </button>
-            </div>
-
-            <div id="route" class="back-tab" style="display:none;">
-                <pre id="route_code">{{route}}</pre>
-                <button class="btn btn-sm btn-light copy-btn" onclick="copyCode('route_code')">
-                    <i class="bi bi-clipboard"></i> Copy
-                </button>
-            </div>
-
-            <div id="guide" class="back-tab" style="display:none;">
-                <pre>{{ guide }}</pre>
-            </div>
-        </div>
+    <!-- Front-End Tab (empty for now) -->
+    <div
+      id="frontend"
+      class="tab-content p-2 border rounded"
+      style="display: block"
+    >
+      <p class="text-muted">Front-End code generation coming soon...</p>
     </div>
+
+    <!-- Back-End Tab -->
+    <div
+      id="backend"
+      class="tab-content p-2 border rounded"
+      style="display: none"
+    >
+      <div class="mb-3">
+        <button
+          class="btn btn-primary tab-btn"
+          onclick="showBackTab('migration')"
+        >
+          Migration
+        </button>
+        <button
+          class="btn btn-secondary tab-btn"
+          onclick="showBackTab('model')"
+        >
+          Model
+        </button>
+        <button
+          class="btn btn-info tab-btn"
+          onclick="showBackTab('controller')"
+        >
+          Controller
+        </button>
+        <button class="btn btn-warning tab-btn" onclick="showBackTab('route')">
+          Route
+        </button>
+        <button class="btn btn-dark tab-btn" onclick="showBackTab('guide')">
+          Guide
+        </button>
+      </div>
+
+      <div id="migration" class="back-tab">
+        <pre id="migration_code">{{migration}}</pre>
+        <button
+          class="btn btn-sm btn-light copy-btn"
+          onclick="copyCode('migration_code')"
+        >
+          <i class="bi bi-clipboard"></i> Copy
+        </button>
+      </div>
+
+      <div id="model" class="back-tab" style="display: none">
+        <pre id="model_code">{{model}}</pre>
+        <button
+          class="btn btn-sm btn-light copy-btn"
+          onclick="copyCode('model_code')"
+        >
+          <i class="bi bi-clipboard"></i> Copy
+        </button>
+      </div>
+
+      <div id="controller" class="back-tab" style="display: none">
+        <pre id="controller_code">{{controller}}</pre>
+        <button
+          class="btn btn-sm btn-light copy-btn"
+          onclick="copyCode('controller_code')"
+        >
+          <i class="bi bi-clipboard"></i> Copy
+        </button>
+      </div>
+
+      <div id="route" class="back-tab" style="display: none">
+        <pre id="route_code">{{route}}</pre>
+        <button
+          class="btn btn-sm btn-light copy-btn"
+          onclick="copyCode('route_code')"
+        >
+          <i class="bi bi-clipboard"></i> Copy
+        </button>
+      </div>
+
+      <div id="guide" class="back-tab" style="display: none">
+        <pre>{{ guide }}</pre>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-function toggleEnum() {
+  function toggleEnum() {
     let type = document.getElementById("type").value;
     document.getElementById("enum_select").style.display =
-        type === "enum" ? "block" : "none";
-}
+      type === "enum" ? "block" : "none";
+  }
 
-function showTopTab(tab) {
-    document.getElementById('frontend').style.display = (tab==='frontend') ? 'block':'none';
-    document.getElementById('backend').style.display = (tab==='backend') ? 'block':'none';
-    document.getElementById('frontend-tab').classList.toggle('active', tab==='frontend');
-    document.getElementById('backend-tab').classList.toggle('active', tab==='backend');
-}
+  function showTopTab(tab) {
+    document.getElementById("frontend").style.display =
+      tab === "frontend" ? "block" : "none";
+    document.getElementById("backend").style.display =
+      tab === "backend" ? "block" : "none";
+    document
+      .getElementById("frontend-tab")
+      .classList.toggle("active", tab === "frontend");
+    document
+      .getElementById("backend-tab")
+      .classList.toggle("active", tab === "backend");
+  }
 
-function showBackTab(tab) {
-    let backTabs = ['migration','model','controller','route','guide'];
-    backTabs.forEach(t => document.getElementById(t).style.display='none');
-    document.getElementById(tab).style.display='block';
-}
+  function showBackTab(tab) {
+    let backTabs = ["migration", "model", "controller", "route", "guide"];
+    backTabs.forEach(
+      (t) => (document.getElementById(t).style.display = "none"),
+    );
+    document.getElementById(tab).style.display = "block";
+  }
 
-function copyCode(id) {
+  function copyCode(id) {
     let code = document.getElementById(id).innerText;
     navigator.clipboard.writeText(code).then(() => {
-        alert("Copied!");
+      alert("Copied!");
     });
-}
+  }
 </script>
 
 {% endblock %}
