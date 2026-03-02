@@ -28,9 +28,35 @@
             {% if f[2] == 'enum' %} {% for e in enums %} {% if e[0] == f[4] %}{{
             e[1] }}{% endif %} {% endfor %} {% else %} - {% endif %}
           </td>
-          <td>
-            <!-- Can add edit/delete buttons here -->
-          </td>
+         <td class="d-flex gap-1">
+
+  <!-- EDIT BUTTON -->
+  <button
+    class="btn btn-sm btn-primary"
+    data-bs-toggle="modal"
+    data-bs-target="#editFieldModal"
+    onclick="loadEditField(
+      '{{f[0]}}',
+      '{{f[1]}}',
+      '{{f[2]}}',
+      '{{f[3]}}',
+      '{{f[4]}}'
+    )"
+  >
+    <i class="bi bi-pencil"></i> Edit
+  </button>
+
+  <!-- DELETE BUTTON -->
+  <form method="post" action="/fields/{{f[0]}}/delete">
+    <button
+      class="btn btn-sm btn-danger"
+      onclick="return confirm('Delete this field?')"
+    >
+      <i class="bi bi-trash"></i> Delete
+    </button>
+  </form>
+
+</td>
         </tr>
         {% endfor %}
       </tbody>
@@ -121,6 +147,64 @@
   </div>
 </div>
 
+<div class="modal fade" id="editFieldModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <form method="post" id="editFieldForm">
+
+        <div class="modal-header">
+          <h5>Edit Field</h5>
+          <button class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+
+          <div class="mb-3">
+            <label>Name</label>
+            <input name="name" id="edit_name" class="form-control" required>
+          </div>
+
+          <div class="mb-3">
+            <label>Type</label>
+            <select name="type" id="edit_type" class="form-select" onchange="toggleEditEnum()">
+
+              <option value="string">string</option>
+              <option value="integer">integer</option>
+              <option value="text">text</option>
+              <option value="boolean">boolean</option>
+              <option value="date">date</option>
+              <option value="datetime">datetime</option>
+              <option value="enum">enum</option>
+
+            </select>
+          </div>
+
+          <div class="form-check mb-3">
+            <input type="checkbox" name="nullable" id="edit_nullable">
+            <label>Nullable</label>
+          </div>
+
+          <div id="edit_enum_select" style="display:none">
+            <label>Enum</label>
+            <select name="enum_id" id="edit_enum_id" class="form-select">
+              {% for e in enums %}
+              <option value="{{e[0]}}">{{e[1]}}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-primary">Update</button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>
 <!-- CodeGen Tabs -->
 <div class="row mt-4">
   <div class="col-12">
@@ -183,6 +267,9 @@
         <button class="btn btn-warning tab-btn" onclick="showBackTab('route')">
           Route
         </button>
+        <button class="btn btn-success tab-btn" onclick="showBackTab('facade')">
+          Facade
+        </button>
         <button class="btn btn-dark tab-btn" onclick="showBackTab('guide')">
           Guide
         </button>
@@ -228,47 +315,103 @@
         </button>
       </div>
 
-      <div id="guide" class="back-tab" style="display: none">
-        <pre>{{ guide }}</pre>
+      <div id="facade" class="back-tab" style="display: none">
+        <pre id="facade_code">{{facade}}</pre>
+        <button
+          class="btn btn-sm btn-light copy-btn"
+          onclick="copyCode('facade_code')"
+        >
+          <i class="bi bi-clipboard"></i> Copy
+        </button>
+      </div>
+      <div id="text-translation" class="back-tab" style="display: none;">
+        <pre id="text_translation_code" >{{text_translation}}</pre>
+        <button
+          class="btn btn-sm btn-light copy-btn"
+          onclick="copyCode('text_translation_code')"
+        >
+          <i class="bi bi-clipboard"></i> Copy
+        </button>
+      </div>
+
+
+        <div id="guide" class="back-tab" style="display: none">
+          <pre>{{ guide }}</pre>
+        </div>
       </div>
     </div>
   </div>
+
+  <script>
+    function toggleEnum() {
+      let type = document.getElementById("type").value;
+      document.getElementById("enum_select").style.display =
+        type === "enum" ? "block" : "none";
+    }
+
+    function showTopTab(tab) {
+      document.getElementById("frontend").style.display =
+        tab === "frontend" ? "block" : "none";
+      document.getElementById("backend").style.display =
+        tab === "backend" ? "block" : "none";
+      document
+        .getElementById("frontend-tab")
+        .classList.toggle("active", tab === "frontend");
+      document
+        .getElementById("backend-tab")
+        .classList.toggle("active", tab === "backend");
+    }
+
+    function showBackTab(tab) {
+      let backTabs = [
+        "migration",
+        "model",
+        "controller",
+        "route",
+        "facade",
+        "text-translation",
+        "guide",
+      ];
+      backTabs.forEach(
+        (t) => (document.getElementById(t).style.display = "none"),
+      );
+      document.getElementById(tab).style.display = "block";
+    }
+
+    function copyCode(id) {
+      let code = document.getElementById(id).innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        alert("Copied!");
+      });
+    }
+
+    function loadEditField(id, name, type, nullable, enum_id)
+{
+
+    document.getElementById("editFieldForm").action =
+        "/fields/" + id + "/edit";
+
+    document.getElementById("edit_name").value = name;
+
+    document.getElementById("edit_type").value = type;
+
+    document.getElementById("edit_nullable").checked =
+        nullable == 1;
+
+    document.getElementById("edit_enum_id").value =
+        enum_id;
+
+    toggleEditEnum();
+}
+
+function toggleEditEnum()
+{
+    let type = document.getElementById("edit_type").value;
+
+    document.getElementById("edit_enum_select").style.display =
+        type === "enum" ? "block" : "none";
+}
+  </script>
+
+  {% endblock %}
 </div>
-
-<script>
-  function toggleEnum() {
-    let type = document.getElementById("type").value;
-    document.getElementById("enum_select").style.display =
-      type === "enum" ? "block" : "none";
-  }
-
-  function showTopTab(tab) {
-    document.getElementById("frontend").style.display =
-      tab === "frontend" ? "block" : "none";
-    document.getElementById("backend").style.display =
-      tab === "backend" ? "block" : "none";
-    document
-      .getElementById("frontend-tab")
-      .classList.toggle("active", tab === "frontend");
-    document
-      .getElementById("backend-tab")
-      .classList.toggle("active", tab === "backend");
-  }
-
-  function showBackTab(tab) {
-    let backTabs = ["migration", "model", "controller", "route", "guide"];
-    backTabs.forEach(
-      (t) => (document.getElementById(t).style.display = "none"),
-    );
-    document.getElementById(tab).style.display = "block";
-  }
-
-  function copyCode(id) {
-    let code = document.getElementById(id).innerText;
-    navigator.clipboard.writeText(code).then(() => {
-      alert("Copied!");
-    });
-  }
-</script>
-
-{% endblock %}

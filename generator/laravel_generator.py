@@ -208,6 +208,31 @@ Route::resource('{table_snake}', {model}Controller::class);
 
         return route
 
+    #Generate Facade
+    def generate_facade(self, table):
+
+        model = self.to_model_name(table)
+
+        facade = f"""<?php
+namespace App\\Facades;
+
+use Illuminate\\Support\\Facades\\Facade;
+
+class {model}Facade extends Facade
+{{
+    protected static function getFacadeAccessor()
+    {{
+        return '{model}';
+    }}
+}}
+"""
+
+        return facade
+    
+#Generate Text Translation
+
+
+
 
     # Generate API Route
     def generate_api_route(self, table):

@@ -197,7 +197,30 @@ def delete_enum_value(enum_id, value):
     delete_enum_value(enum_id, value)  # You need this function in enum_service.py
     flash(f"Value '{value}' deleted", "success")
     return redirect(f"/enums/{enum_id}")
+@app.route("/fields/<int:field_id>/delete", methods=["POST"])
+def delete_field_route(field_id):
+    delete_field(field_id)  # this is your DB function
+    return redirect(request.referrer)
+@app.route("/fields/<int:field_id>/edit", methods=["POST"])
+def edit_field_route(field_id):
 
+    name = request.form["name"]
+    field_type = request.form["type"]
+    nullable = 1 if request.form.get("nullable") else 0
+    enum_id = request.form.get("enum_id")
+
+    if field_type != "enum":
+        enum_id = None
+
+    update_field(
+        field_id,
+        name,
+        field_type,
+        nullable,
+        int(enum_id) if enum_id else None
+    )
+
+    return redirect(request.referrer)
 
 @app.route("/enums/<int:enum_id>/codegen")
 def enum_codegen(enum_id):

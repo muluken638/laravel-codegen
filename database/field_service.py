@@ -27,3 +27,19 @@ def get_fields(table_id):
     conn.close()
 
     return rows
+
+def update_field(field_id, name, field_type, nullable=0, enum_id=None):
+    
+    conn = get_connection()
+
+    conn.execute("""
+                 Update fields set name=?, type=?, nullable=?, enum_id=? where id=? """, (name, field_type, nullable, enum_id, field_id))
+    conn.commit()
+    conn.close()
+
+def delete_field(field_id):
+    conn= get_connection()
+    conn.execute("""
+                 Delete from fields where id=? """, (field_id,))
+    conn.commit()
+    conn.close()
